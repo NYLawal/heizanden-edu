@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heizanden EduAssess | School Assessment Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="dashboard-header">
+    <div class="header-brand">
+      <div id="dashboardMessage" class="message" role="status"></div>
+      <h1>Heizanden EduAssess</h1>
+      <p>A Smarter Way to Create, Manage &amp; Assess</p>
+    </div>
+    <button id="logoutButton" class="logout-button">Log Out</button>
+  </header>
+
+  <main>
+    <section class="login-options">
+  <section id="loginPanel" class="panel">
+    <h2>Teacher Login</h2>
+    <p>Enter your teacher password to continue.</p>
+    <form id="loginForm">
+      <label for="password">Teacher password</label>
+      <input id="password" type="password" required autocomplete="current-password">
+      <button type="submit">Log in</button>
+    </form>
+    <div id="loginMessage" class="message" role="status"></div>
+  </section>
+
+  <section id="studentPanel" class="panel">
+    <h2>Student Login / Register</h2>
+    <p>Register with your school details or log in using your access code.</p>
+
+    <div class="student-actions">
+      <button type="button" id="showStudentLogin">Student Login</button>
+      <button type="button" id="showStudentRegister">Register</button>
+    </div>
+
+    <div id="studentMessage" class="message" role="status"></div>
+
+    <form id="studentLoginForm" hidden>
+      <h3>Student Login</h3>
+      <label for="studentAccessCode">Your access code</label>
+      <input id="studentAccessCode" type="text" required maxlength="20"
+             autocomplete="off" placeholder="Enter your access code">
+      <button type="submit">Access Assessments</button>
+    </form>
+
+    <form id="studentRegisterForm" hidden>
+      <h3>Student Registration</h3>
+
+      <label for="registerStudentName">Full name</label>
+      <input id="registerStudentName" type="text" required maxlength="120"
+             placeholder="Enter your full name">
+
+      <label for="registerAdmissionNumber">Admission number</label>
+      <input id="registerAdmissionNumber" type="text" required maxlength="50"
+             placeholder="Enter your admission number">
+
+      <label for="registerStudentClass">Class</label>
+      <select id="registerStudentClass" required>
+        <option value="">Select class</option>
+        <option>JSS1</option>
+        <option>JSS2</option>
+        <option>JSS3</option>
+        <option>SS1</option>
+        <option>SS2</option>
+        <option>SS3</option>
+      </select>
+
+      <label for="registerSchoolId">School ID</label>
+      <input id="registerSchoolId" type="text" required maxlength="80"
+             placeholder="Enter the School ID given by your school">
+
+      <button type="submit">Register and Generate Access Code</button>
+    </form>
+
+    <div id="studentAccessCodeResult" class="message" role="status" hidden></div>
+  </section>
+</section>
+
+
+    <section id="dashboard" class="hidden">
+      <div class="panel stdintro">
+        <h2>Student Management</h2>
+        <p>Generate access codes, import class lists, and manage student records.</p>
+      </div>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>Add One Student</h2>
+          <form id="studentForm">
+            <label for="studentName">Student name</label>
+            <input id="studentName" required maxlength="120" placeholder="Enter full name">
+
+            <label for="admissionNumber">Admission number</label>
+            <input id="admissionNumber" required maxlength="50" placeholder="Enter admission number">
+
+            <label for="studentClass">Class</label>
+            <select id="studentClass" required>
+              <option value="">Select class</option>
+              <option>JSS1</option>
+              <option>JSS2</option>
+              <option>JSS3</option>
+              <option>SS1</option>
+              <option>SS2</option>
+              <option>SS3</option>
+            </select>
+
+            <button type="submit">Generate access code</button>
+          </form>
+          <div id="studentMessage" class="message" role="status"></div>
+        </section>
+
+
+
+        <section class="panel">
+          <h2>Import Students from CSV</h2>
+          <p class="small">Use columns named <strong>name</strong> and <strong>studentClass</strong>. Maximum file size:
+            2 MB.</p>
+          <p class="small">Admission numbers are optional and can be added or corrected later using Edit.</p>
+          <form id="csvForm">
+            <label for="csvFile">Choose CSV file</label>
+            <input id="csvFile" type="file" accept=".csv,text/csv" required>
+            <button type="submit">Import CSV</button>
+          </form>
+          <div id="csvMessage" class="message" role="status"></div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <h2>Student Records</h2>
+        <button id="refreshButton" class="" type="button">Load Students</button>
+        <br>
+        <br>
+        <div class="grid">
+          <div>
+            <label for="viewMode">Records</label>
+            <select id="viewMode">
+              <option value="active">Active students</option>
+              <option value="archived">Archived students</option>
+            </select>
+          </div>
+          <div>
+            <label for="search">Search by name, class, code or admission number</label>
+            <input id="search" placeholder="Type to search">
+          </div>
+        </div>
+        <p id="studentCount" class="small"></p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Admission number</th>
+                <th>Access code</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="studentTable">
+              <tr>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small edit-note">Edit student details or archive records for students who have left the school.</p>
+      </section>
+
+      <hr>
+      <!-- Question Bank introduction -->
+      <div class="panel question-intro">
+        <h2>Question Bank Management</h2>
+        <p>Add questions individually, import questions from Word documents, and organise your question bank by class,
+          subject, and topic.</p>
+        <div id="questionMessage" class="message" role="status"></div>
+      </div>
+
+      <section class="panel">
+        <h2>Import Questions from Word</h2>
+        <p>Select a Word document (.docx) containing your questions. The app will extract the text for you to review
+          before importing.</p>
+
+        <form id="wordImportForm">
+          <div class="field">
+            <label for="wordFile">Word document (.docx)</label>
+            <input type="file" id="wordFile" name="wordFile"
+              accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
+          </div>
+          <button type="submit" class="primary">Preview Questions</button>
+        </form>
+
+        <div id="wordImportMessage" role="status" aria-live="polite"></div>
+
+        <div id="wordImportPreview" hidden>
+          <h3>Extracted Text</h3>
+          <pre id="wordImportText" style="white-space: pre-wrap; overflow-wrap: anywhere;"></pre>
+          <button type="button" id="clearWordPreview" class="secondary">Clear Preview</button>
+        </div>
+      </section>
+
+      <section class="panel" id="questionBankPanel">
+        <h2>Question Bank</h2>
+        <p>Add and organise questions for each class. Questions can later be selected for quizzes, assignments, and
+          assessments.</p>
+
+        <form id="questionForm">
+          <label for="questionClass">Class</label>
+          <select id="questionClass" required>
+            <option value="">Select class</option>
+            <option>JSS1</option>
+            <option>JSS2</option>
+            <option>JSS3</option>
+            <option>SS1</option>
+            <option>SS2</option>
+            <option>SS3</option>
+          </select>
+
+          <label for="questionTopic">Topic</label>
+          <input id="questionTopic" required maxlength="150" placeholder="e.g. Number Systems">
+
+          <label for="questionType">Question type</label>
+          <select id="questionType" required>
+            <option value="mcq">Multiple choice (MCQ)</option>
+            <option value="true_false">True or False</option>
+            <option value="short_answer">Short answer</option>
+            <option value="structured">Structured question</option>
+            <option value="practical">Practical task</option>
+          </select>
+
+          <label for="questionTextInput">Question or main instruction</label>
+          <textarea id="questionTextInput" required rows="3" maxlength="3000"
+            placeholder="Enter the question"></textarea>
+
+          <div id="questionTypeFields"></div>
+
+          <label for="questionMarks">Total marks</label>
+          <input id="questionMarks" type="number" min="0" step="1" value="1" required>
+
+          <button type="submit">Save question</button>
+        </form>
+
+        <div id="questionMessage" class="message" role="status" aria-live="polite"></div>
+
+        <hr>
+
+        <h3>Saved Questions</h3>
+        <label for="questionSearch">Search questions</label>
+        <input id="questionSearch" type="search" placeholder="Search question text or topic...">
+        <div class="grid">
+          <div>
+            <label for="questionFilterClass">Filter by class</label>
+            <select id="questionFilterClass">
+              <option value="">All classes</option>
+              <option>JSS1</option>
+              <option>JSS2</option>
+              <option>JSS3</option>
+              <option>SS1</option>
+              <option>SS2</option>
+              <option>SS3</option>
+            </select>
+          </div>
+          <div>
+            <label for="questionFilterTopic">Filter by topic</label>
+            <input id="questionFilterTopic" placeholder="Enter topic">
+            <label for="questionFilterType">Filter by question type</label>
+            <select id="questionFilterType">
+              <option value="">All question types</option>
+              <option value="mcq">Multiple choice (MCQ)</option>
+              <option value="true_false">True or False</option>
+              <option value="short_answer">Short answer</option>
+              <option value="structured">Structured question</option>
+              <option value="practical">Practical task</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="button" id="loadQuestionsButton">Load questions</button>
+        <div class="pagination">
+          <button type="button" id="previousQuestionsButton" disabled>← Previous</button>
+          <span id="questionPageInfo">Page 1 of 1</span>
+          <button type="button" id="nextQuestionsButton" disabled>Next →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Class</th>
+                <th>Topic</th>
+                <th>Type</th>
+                <th>Question</th>
+                <th>Marks</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="questionTable">
+              <tr>
+                <td colspan="5">Select Load questions to view saved questions.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    let teacherPassword = '';
+    let students = [];
+
+    const $ = id => document.getElementById(id);
+    const wordImportForm = $('wordImportForm');
+
+    wordImportForm.addEventListener('submit', async event => {
+      event.preventDefault();
+
+      const file = $('wordFile').files[0];
+      if (!file) {
+        showMessage('Please select a Word document.', 'error');
+        return;
+      }
+
+      const message = $('wordImportMessage');
+      const preview = $('wordImportPreview');
+      const textOutput = $('wordImportText');
+
+      message.textContent = 'Extracting text from Word document...';
+      preview.hidden = true;
+      textOutput.textContent = '';
+
+      try {
+        const formData = new FormData();
+        formData.append('wordFile', file);
+
+        const response = await fetch('/questions/import-word/preview', {
+          method: 'POST',
+          headers: {
+            'x-teacher-password': teacherPassword
+          },
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Could not read the Word document.');
+        }
+
+        textOutput.textContent = result.text;
+        preview.hidden = false;
+        message.textContent = result.message;
+
+        if (result.warnings && result.warnings.length) {
+          message.textContent += ' Warnings: ' + result.warnings.join(' ');
+        }
+      } catch (error) {
+        message.textContent = error.message || 'Word import failed.';
+      }
+    });
+
+    $('clearWordPreview').addEventListener('click', () => {
+      $('wordImportForm').reset();
+      $('wordImportPreview').hidden = true;
+      $('wordImportText').textContent = '';
+      $('wordImportMessage').textContent = '';
+    });
+
+    async function api(path, options = {}) {
+      const headers = {
+        'x-teacher-password': teacherPassword,
+        ...(options.headers || {})
+      };
+
+      const response = await fetch('/students' + path, {
+        ...options,
+        headers
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || 'Request failed.');
+      return data;
+    }
+
+    function showMessage(id, message, success = false) {
+      const element = $(id);
+
+      if (!element) {
+        console.error(`showMessage: No HTML element found with id "${id}".`);
+        return;
+      }
+
+      element.textContent = message;
+      element.className = 'message ' + (success ? 'success' : 'error');
+    }
+
+    $('loginForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      teacherPassword = $('password').value;
+
+      try {
+        await api('/');
+        $('loginPanel').classList.add('hidden');
+        $('dashboard').classList.remove('hidden');
+        $('password').value = '';
+
+      } catch (error) {
+        teacherPassword = '';
+        showMessage('loginMessage', error.message);
+      }
+    });
+
+    $('logoutButton').addEventListener('click', () => {
+      teacherPassword = '';
+      students = [];
+      $('dashboard').classList.add('hidden');
+      $('loginPanel').classList.remove('hidden');
+      $('loginMessage').textContent = '';
+      $('studentTable').replaceChildren();
+    });
+
+    $('studentForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      try {
+        const data = await api('/generate-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: $('studentName').value.trim(),
+            admissionNumber: $('admissionNumber').value.trim(),
+            studentClass: $('studentClass').value
+          })
+        });
+
+        showMessage(
+          'studentMessage',
+          'Student added successfully. Check the Student Records table or click Refresh/Load Students to view the new record.',
+          true
+        );
+        $('studentForm').reset();
+        await loadStudents();
+      } catch (error) {
+        showMessage('studentMessage', error.message);
+      }
+    });
+
+    $('csvForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const file = $('csvFile').files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const data = await api('/import-csv', {
+          method: 'POST',
+          body: formData
+        });
+
+        const skippedDetails = (data.skipped || [])
+          .map(row => `Row ${row.row}: ${row.reason}`)
+          .join('\n');
+
+        showMessage(
+          'csvMessage',
+          `Imported: ${data.imported}\nSkipped: ${data.skippedCount}` +
+          (skippedDetails ? `\n\n${skippedDetails}` : ''),
+          data.skippedCount === 0
+        );
+        $('csvForm').reset();
+        await loadStudents();
+      } catch (error) {
+        showMessage('csvMessage', error.message);
+      }
+    });
+
+    async function loadStudents() {
+      try {
+        const archived = $('viewMode').value === 'archived';
+        const data = await api('/?archived=' + archived);
+        students = data.students || [];
+        renderStudents();
+        showMessage('dashboardMessage', 'Student records loaded.', true);
+      } catch (error) {
+        showMessage('dashboardMessage', error.message);
+      }
+    }
+
+    // Load student records when the Refresh Students button is clicked and temporarily disable the button while loading.
+    $('refreshButton').addEventListener('click', async () => {
+      const button = $('refreshButton');
+      button.disabled = true;
+      button.textContent = 'Loading students...';
+
+      try {
+        await loadStudents();
+      } catch (error) {
+        showMessage('studentMessage', error.message || 'Could not load students.');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Refresh Students';
+      }
+    });
+
+    function renderStudents() {
+      const query = $('search').value.trim().toLowerCase();
+      const filtered = students.filter(student =>
+        [
+          student.name,
+          student.studentClass,
+          student.accessCode,
+          student.admissionNumber
+        ].some(value => String(value || '').toLowerCase().includes(query))
+      );
+
+      $('studentCount').textContent = `${filtered.length} student(s) shown`;
+      const tbody = $('studentTable');
+      tbody.replaceChildren();
+
+      if (!filtered.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 6;
+        cell.textContent = 'No students found.';
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+      }
+
+      for (const student of filtered) {
+        const row = document.createElement('tr');
+
+        for (const value of [
+          student.name,
+          student.studentClass,
+          student.admissionNumber || '—',
+          student.accessCode,
+        ]) {
+          const cell = document.createElement('td');
+          cell.textContent = value;
+          row.appendChild(cell);
+        }
+
+        const actions = document.createElement('td');
+        actions.className = 'actions';
+
+        const addButton = (label, action, className = 'secondary') => {
+          const element = document.createElement('button');
+          element.textContent = label;
+          element.className = className;
+          element.addEventListener('click', action);
+          actions.appendChild(element);
+        };
+
+        addButton('Edit', () => editStudent(student));
+
+        if (student.isArchived) {
+          addButton('Restore', () => changeStudent(student._id, 'restore'));
+          addButton('Delete permanently', () => permanentlyDelete(student), 'danger');
+        } else {
+          addButton('Archive', () => changeStudent(student._id, 'archive'), 'warning');
+        }
+
+        row.appendChild(actions);
+        tbody.appendChild(row);
+      }
+    }
+
+    async function editStudent(student) {
+      const name = prompt('Correct student name:', student.name);
+      if (name === null) return;
+
+      const studentClass = prompt(
+        'Student class (JSS1, JSS2, JSS3, SS1, SS2 or SS3):',
+        student.studentClass
+      );
+      if (studentClass === null) return;
+
+      const admissionNumber = prompt(
+        'Admission number (leave blank if not available):',
+        student.admissionNumber || ''
+      );
+      if (admissionNumber === null) return;
+
+      const cleanClass = studentClass.trim().toUpperCase();
+      const validClasses = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
+      if (!name.trim()) {
+        showMessage('dashboardMessage', 'Student name cannot be empty.');
+        return;
+      }
+      if (!validClasses.includes(cleanClass)) {
+        showMessage('dashboardMessage', 'Invalid class. Use JSS1, JSS2, JSS3, SS1, SS2 or SS3.');
+        return;
+      }
+
+      try {
+        await api('/' + student._id, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name.trim(),
+            admissionNumber: admissionNumber.trim(),
+            studentClass: cleanClass
+          })
+        });
+        showMessage('dashboardMessage', 'Student details updated.', true);
+        await loadStudents();
+      } catch (error) {
+        showMessage('dashboardMessage', error.message);
+      }
+    }
+
+    async function changeStudent(id, action) {
+      const verb = action === 'archive' ? 'archive' : 'restore';
+      if (!confirm(`Are you sure you want to ${verb} this student?`)) return;
+
+      try {
+        await api(`/${id}/${action}`, { method: 'PATCH' });
+        await loadStudents();
+      } catch (error) {
+        showMessage('dashboardMessage', error.message);
+      }
+    }
+
+    async function permanentlyDelete(student) {
+      if (!confirm(
+        `Permanently delete ${student.name}?\n\n` +
+        'This action cannot be undone. Only proceed if you are sure.'
+      )) return;
+
+      try {
+        await api('/' + student._id, { method: 'DELETE' });
+        await loadStudents();
+      } catch (error) {
+        showMessage('dashboardMessage', error.message);
+      }
+    }
+
+    $('refreshButton').addEventListener('click', loadStudents);
+    $('viewMode').addEventListener('change', loadStudents);
+    $('search').addEventListener('input', renderStudents);
+  </script>
+  <script>
+    (function () {
+      const form = document.getElementById('questionForm');
+      const typeSelect = document.getElementById('questionType');
+      const fields = document.getElementById('questionTypeFields');
+      const message = document.getElementById('questionMessage');
+      const table = document.getElementById('questionTable');
+      let currentQuestionPage = 1;
+      const questionsPerPage = 20;
+      let totalQuestionPages = 1;
+      let editingQuestionId = null;
+
+      if (!form || !typeSelect || !fields || !message || !table) return;
+
+      function showMessage(text, error = false) {
+        message.textContent = text;
+        message.className = error ? 'message error' : 'message';
+      }
+
+      function renderTypeFields() {
+        const type = typeSelect.value;
+
+        if (type === 'mcq') {
+          fields.innerHTML = `
+        <label>Option A</label><input id="optionA" required>
+        <label>Option B</label><input id="optionB" required>
+        <label>Option C</label><input id="optionC" required>
+        <label>Option D</label><input id="optionD" required>
+        <label>Correct option</label>
+        <select id="correctAnswer" required>
+          <option value="">Select answer</option>
+          <option value="A">A</option><option value="B">B</option>
+          <option value="C">C</option><option value="D">D</option>
+        </select>`;
+        } else if (type === 'true_false') {
+          fields.innerHTML = `
+        <label>Correct answer</label>
+        <select id="trueFalseAnswer" required>
+          <option value="">Select answer</option>
+          <option value="True">True</option>
+          <option value="False">False</option>
+        </select>`;
+        } else if (type === 'short_answer') {
+          fields.innerHTML = `
+        <label>Answer key</label>
+        <textarea id="answerKey" required rows="2"></textarea>
+        <label>Other acceptable answers (separate with commas)</label>
+        <input id="acceptableAnswers" placeholder="Optional">`;
+        } else if (type === 'structured') {
+          fields.innerHTML = `
+        <p>Enter up to three parts. Leave unused parts blank.</p>
+        ${[1, 2, 3].map(n => `
+          <fieldset>
+            <legend>Part ${n}</legend>
+            <label>Part label</label>
+            <input class="part-label" value="${String.fromCharCode(96 + n)}">
+            <label>Part question</label>
+            <textarea class="part-question" rows="2"></textarea>
+            <label>Marks for this part</label>
+            <input class="part-marks" type="number" min="0" step="1">
+            <label>Answer key</label>
+            <textarea class="part-answer" rows="2"></textarea>
+          </fieldset>`).join('')}
+        <label>Overall answer key (optional)</label>
+        <textarea id="answerKey" rows="2"></textarea>`;
+        } else if (type === 'practical') {
+          fields.innerHTML = `
+        <label>Practical instructions</label>
+        <textarea id="practicalInstructions" required rows="3"></textarea>
+        <label>Marking guide / answer key</label>
+        <textarea id="answerKey" rows="3"></textarea>`;
+        }
+      }
+
+      typeSelect.addEventListener('change', renderTypeFields);
+      renderTypeFields();
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const type = typeSelect.value;
+        const payload = {
+          studentClass: document.getElementById('questionClass').value,
+          topic: document.getElementById('questionTopic').value.trim(),
+          questionType: type,
+          questionText: document.getElementById('questionTextInput').value.trim(),
+          marks: Number(document.getElementById('questionMarks').value)
+        };
+
+        if (type === 'mcq') {
+          payload.options = ['A', 'B', 'C', 'D'].map(letter =>
+            document.getElementById('option' + letter).value.trim()
+          );
+          payload.correctAnswer = document.getElementById('correctAnswer').value;
+        } else if (type === 'true_false') {
+          payload.trueFalseAnswer = document.getElementById('trueFalseAnswer').value;
+        } else if (type === 'short_answer') {
+          payload.answerKey = document.getElementById('answerKey').value.trim();
+          payload.acceptableAnswers = document.getElementById('acceptableAnswers').value
+            .split(',').map(x => x.trim()).filter(Boolean);
+        } else if (type === 'structured') {
+          payload.parts = Array.from(fields.querySelectorAll('fieldset'))
+            .map(part => ({
+              partLabel: part.querySelector('.part-label').value.trim(),
+              questionText: part.querySelector('.part-question').value.trim(),
+              marks: Number(part.querySelector('.part-marks').value || 0),
+              answerKey: part.querySelector('.part-answer').value.trim()
+            }))
+            .filter(part => part.questionText);
+
+          const answerKey = document.getElementById('answerKey').value.trim();
+          if (answerKey) payload.answerKey = answerKey;
+        } else if (type === 'practical') {
+          payload.practicalInstructions =
+            document.getElementById('practicalInstructions').value.trim();
+          payload.answerKey = document.getElementById('answerKey').value.trim();
+        }
+
+        try {
+          showMessage('Saving question...');
+
+          const response = await fetch(
+            editingQuestionId
+              ? `/questions/${editingQuestionId}`
+              : '/questions',
+            {
+              method: editingQuestionId ? 'PUT' : 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-teacher-password': teacherPassword
+              },
+              body: JSON.stringify(payload)
+            });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || 'Could not save question.');
+          }
+
+          showMessage(
+            editingQuestionId
+              ? 'Question updated successfully.'
+              : 'Question saved successfully.'
+          );
+
+          editingQuestionId = null;
+          form.reset();
+          document.getElementById('questionMarks').value = 1;
+          renderTypeFields();
+          await loadQuestions();
+        } catch (error) {
+          showMessage(error.message || 'An error occurred while saving.', true);
+        }
+      });
+
+      function editQuestion(question) {
+        editingQuestionId = question._id;
+        document.getElementById('questionClass').value = question.studentClass;
+        document.getElementById('questionTopic').value = question.topic;
+        document.getElementById('questionType').value = question.questionType;
+        document.getElementById('questionTextInput').value = question.questionText;
+        document.getElementById('questionMarks').value = question.marks;
+
+        renderTypeFields();
+
+        if (question.questionType === 'mcq') {
+          ['A', 'B', 'C', 'D'].forEach((letter, index) => {
+            document.getElementById('option' + letter).value = question.options[index] || '';
+          });
+          document.getElementById('correctAnswer').value = question.correctAnswer || '';
+        } else if (question.questionType === 'true_false') {
+          document.getElementById('trueFalseAnswer').value = question.trueFalseAnswer || '';
+        } else if (question.questionType === 'short_answer') {
+          document.getElementById('answerKey').value = question.answerKey || '';
+          document.getElementById('acceptableAnswers').value =
+            (question.acceptableAnswers || []).join(', ');
+        } else if (question.questionType === 'structured') {
+          const partFields = document.querySelectorAll('#questionTypeFields fieldset');
+          (question.parts || []).forEach((part, index) => {
+            if (partFields[index]) {
+              partFields[index].querySelector('.part-label').value = part.partLabel || '';
+              partFields[index].querySelector('.part-question').value = part.questionText || '';
+              partFields[index].querySelector('.part-marks').value = part.marks ?? '';
+              partFields[index].querySelector('.part-answer').value = part.answerKey || '';
+            }
+          });
+          document.getElementById('answerKey').value = question.answerKey || '';
+        } else if (question.questionType === 'practical') {
+          document.getElementById('practicalInstructions').value =
+            question.practicalInstructions || '';
+          document.getElementById('answerKey').value = question.answerKey || '';
+        }
+
+        document.getElementById('questionForm').scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+        showMessage('Editing question. Make your changes, then save.');
+      }
+
+      async function loadQuestions() {
+        const studentClass = document.getElementById('questionFilterClass').value;
+        const topic = document.getElementById('questionFilterTopic').value.trim();
+        const search = document.getElementById('questionSearch').value.trim();
+        const params = new URLSearchParams();
+
+        if (studentClass) params.set('studentClass', studentClass);
+        if (topic) params.set('topic', topic);
+        if (search) params.set('search', search);
+
+        const questionType = document.getElementById('questionFilterType').value;
+        if (questionType) params.set('questionType', questionType);
+        params.set('page', currentQuestionPage);
+        params.set('limit', questionsPerPage);
+
+        try {
+          const response = await fetch('/questions?' + params.toString(), {
+            headers: { 'x-teacher-password': teacherPassword }
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || 'Could not load questions.');
+          }
+
+          const questions = Array.isArray(result)
+            ? result
+            : (result.questions || result.data || []);
+
+          totalQuestionPages = result.totalPages || 1;
+
+          const pageInfo = document.getElementById('questionPageInfo');
+          const previousButton = document.getElementById('previousQuestionsButton');
+          const nextButton = document.getElementById('nextQuestionsButton');
+
+          pageInfo.textContent = `Page ${currentQuestionPage} of ${totalQuestionPages}`;
+          previousButton.disabled = currentQuestionPage <= 1;
+          nextButton.disabled = currentQuestionPage >= totalQuestionPages;
+
+          table.replaceChildren();
+
+          if (!questions.length) {
+            table.innerHTML = '<tr><td colspan="5">No questions found.</td></tr>';
+            return;
+          }
+
+          questions.forEach(question => {
+            const row = document.createElement('tr');
+
+            [
+              question.studentClass || '',
+              question.topic || '',
+              question.questionType || '',
+              question.questionText || '',
+              question.marks ?? ''
+            ].forEach(value => {
+              const cell = document.createElement('td');
+              cell.textContent = value;
+              row.appendChild(cell);
+            });
+
+            const actionsCell = document.createElement('td');
+            const editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.textContent = 'Edit';
+            editButton.addEventListener('click', () => editQuestion(question));
+            actionsCell.appendChild(editButton);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.textContent = 'Delete';
+
+            deleteButton.addEventListener('click', async () => {
+              if (!confirm('Delete this question permanently? This cannot be undone.')) {
+                return;
+              }
+
+              try {
+                const response = await fetch(
+                  '/questions/' + encodeURIComponent(question._id),
+                  {
+                    method: 'DELETE',
+                    headers: {
+                      'x-teacher-password': teacherPassword
+                    }
+                  }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                  throw new Error(result.message || 'Could not delete question.');
+                }
+
+                showMessage(result.message, 'success');
+                await loadQuestions();
+              } catch (error) {
+                showMessage(error.message, 'error');
+              }
+            });
+
+            actionsCell.appendChild(deleteButton);
+            row.appendChild(actionsCell);
+            table.appendChild(row);
+          });
+        } catch (error) {
+          table.innerHTML = '';
+          const row = document.createElement('tr');
+          const cell = document.createElement('td');
+          cell.colSpan = 5;
+          cell.textContent = error.message || 'Could not load questions.';
+          row.appendChild(cell);
+          table.appendChild(row);
+        }
+      }
+
+      document.getElementById('loadQuestionsButton')
+        .addEventListener('click', loadQuestions);
+      document.getElementById('previousQuestionsButton')
+        .addEventListener('click', () => {
+          if (currentQuestionPage > 1) {
+            currentQuestionPage--;
+            loadQuestions();
+          }
+        });
+
+      document.getElementById('nextQuestionsButton')
+        .addEventListener('click', () => {
+          if (currentQuestionPage < totalQuestionPages) {
+            currentQuestionPage++;
+            loadQuestions();
+          }
+        });
+
+      document.getElementById('questionFilterClass')
+        .addEventListener('change', () => {
+          currentQuestionPage = 1;
+          loadQuestions();
+        });
+
+      document.getElementById('questionFilterTopic')
+        .addEventListener('input', () => {
+          currentQuestionPage = 1;
+          loadQuestions();
+        });
+
+      document.getElementById('questionFilterType')
+        .addEventListener('change', () => {
+          currentQuestionPage = 1;
+          loadQuestions();
+        });
+
+    })();
+  </script>
+</body>
+
+</html>
