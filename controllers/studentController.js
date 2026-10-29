@@ -1,8 +1,9 @@
-
 const crypto = require('crypto');
 const { parse } = require('csv-parse/sync');
 const Student = require('../models/Student');
 const School = require('../models/School');
+const Question = require('../models/Question');
+const AssessmentResult = require('../models/AssessmentResult');
 
 const validClasses = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
 
@@ -19,7 +20,7 @@ async function createAccessCode() {
 async function generateCode(req, res) {
   try {
     const { name, admissionNumber, studentClass } = req.body;
-    const schoolId = 'default';
+    const schoolId = process.env.SCHOOL_ID;
 
     if (
       typeof name !== 'string' ||
@@ -91,7 +92,7 @@ async function importStudents(req, res) {
       bom: true
     });
 
-    const existingStudents = await Student.find({ schoolId: 'default' })
+    const existingStudents = await Student.find({ schoolId: process.env.SCHOOL_ID })
       .select('name studentClass')
       .lean();
 
@@ -139,7 +140,7 @@ async function importStudents(req, res) {
           name: cleanName,
           studentClass,
           accessCode: await createAccessCode(),
-          schoolId: 'default'
+          schoolId: process.env.SCHOOL_ID
         });
 
         seen.add(key);
@@ -176,7 +177,7 @@ async function listStudents(req, res) {
     const archived = req.query.archived === 'true';
 
     const students = await Student.find({
-      schoolId: 'default',
+      schoolId: process.env.SCHOOL_ID,
       isArchived: archived
     })
       .select('-__v')
@@ -195,7 +196,7 @@ async function archiveStudent(req, res) {
     const student = await Student.findOneAndUpdate(
       {
         _id: req.params.id,
-        schoolId: 'default',
+        schoolId: process.env.SCHOOL_ID,
         isArchived: false
       },
       {
@@ -225,7 +226,7 @@ async function restoreStudent(req, res) {
     const student = await Student.findOneAndUpdate(
       {
         _id: req.params.id,
-        schoolId: 'default',
+        schoolId: process.env.SCHOOL_ID,
         isArchived: true
       },
       {
@@ -254,7 +255,7 @@ async function deleteStudent(req, res) {
   try {
     const student = await Student.findOneAndDelete({
       _id: req.params.id,
-      schoolId: 'default',
+      schoolId: process.env.SCHOOL_ID,
       isArchived: true
     });
 
@@ -316,7 +317,7 @@ async function editStudent(req, res) {
     const student = await Student.findOneAndUpdate(
       {
         _id: req.params.id,
-        schoolId: 'default'
+        schoolId: process.env.SCHOOL_ID
       },
       { $set: updates },
       {
@@ -405,7 +406,13 @@ async function registerStudent(req, res) {
 
     return res.status(201).json({
       message: 'Registration successful. Keep your access code safe; you will need it to access your assessments.',
-      accessCode: student.accessCode
+      accessCode: student.accessCode,
+      schoolName: school.name,
+      student: {
+        name: student.name,
+        admissionNumber: student.admissionNumber,
+        studentClass: student.studentClass
+      }
     });
   } catch (error) {
     console.error('Student registration error:', error.message);
@@ -423,14 +430,295 @@ async function registerStudent(req, res) {
 }
 
 
+async function loginStudent(req, res) {
+  try {
+    const { accessCode } = req.body;
+
+    if (typeof accessCode !== 'string' || !accessCode.trim()) {
+      return res.status(400).json({
+        message: 'Please enter your access code.'
+      });
+    }
+
+    const student = await Student.findOne({
+      accessCode: accessCode.trim().toUpperCase(),
+      isArchived: false
+    });
+
+    if (!student) {
+      return res.status(401).json({
+        message: 'Invalid access code. Please check and try again.'
+      });
+    }
+
+    const school = await School.findOne({
+      schoolId: student.schoolId,
+      isActive: true
+    });
+
+    if (!school) {
+      return res.status(403).json({
+        message: 'Your school account is inactive. Please contact your school.'
+      });
+    }
+
+    req.session.studentId = student._id.toString();
+    req.session.schoolId = student.schoolId;
+
+    return req.session.save(error => {
+      if (error) {
+        console.error('Student session error:', error.message);
+        return res.status(500).json({
+          message: 'Login failed. Please try again.'
+        });
+      }
+
+      return res.status(200).json({
+        message: 'Login successful.',
+        student: {
+          id: student._id,
+          name: student.name,
+          admissionNumber: student.admissionNumber,
+          studentClass: student.studentClass,
+          schoolId: student.schoolId,
+          schoolName: school.name
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Student login error:', error.message);
+
+    return res.status(500).json({
+      message: 'Login failed. Please try again later.'
+    });
+  }
+}
+
+async function getCurrentStudent(req, res) {
+  try {
+    if (!req.session || !req.session.studentId) {
+      return res.status(401).json({
+        message: 'Please log in first.'
+      });
+    }
+
+    const student = await Student.findOne({
+      _id: req.session.studentId,
+      schoolId: req.session.schoolId,
+      isArchived: false
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        message: 'Student record not found.'
+      });
+    }
+
+    const school = await School.findOne({
+      schoolId: student.schoolId,
+      isActive: true
+    });
+
+    if (!school) {
+      return res.status(403).json({
+        message: 'School account is inactive.'
+      });
+    }
+
+    return res.status(200).json({
+      student: {
+        id: student._id,
+        name: student.name,
+        admissionNumber: student.admissionNumber,
+        studentClass: student.studentClass,
+        schoolId: student.schoolId,
+        schoolName: school.name
+      }
+    });
+  } catch (error) {
+    console.error('Get current student error:', error.message);
+
+    return res.status(500).json({
+      message: 'Unable to load student details.'
+    });
+  }
+}
+
+async function getStudentQuestions(req, res) {
+  try {
+    if (!req.session || !req.session.studentId) {
+      return res.status(401).json({
+        message: 'Please log in first.'
+      });
+    }
+
+    const student = await Student.findOne({
+      _id: req.session.studentId,
+      schoolId: req.session.schoolId,
+      isArchived: false
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        message: 'Student record not found.'
+      });
+    }
+
+    
+const baseFilter = {
+  schoolId: student.schoolId,
+  studentClass: student.studentClass
+};
+
+
+    const questions = await Question.find({
+      schoolId: student.schoolId,
+      studentClass: student.studentClass,
+      $or: [
+        { isActive: true },
+        { isActive: { $exists: false } }
+      ]
+    })
+      .select('studentClass topic questionType questionText options parts.partLabel parts.questionText parts.marks practicalInstructions marks createdAt')
+      .sort({ topic: 1, createdAt: 1 })
+      .lean();
+
+    return res.status(200).json({
+      count: questions.length,
+      studentClass: student.studentClass,
+      questions
+    });
+  } catch (error) {
+    console.error('Get student questions error:', error.message);
+
+    return res.status(500).json({
+      message: 'Unable to load questions.'
+    });
+  }
+}
+
+async function submitStudentAnswers(req, res) {
+  try {
+    const student = await Student.findById(req.session.studentId);
+
+    if (!student) {
+      return res.status(401).json({
+        message: 'Please log in again.'
+      });
+    }
+
+    const { answers } = req.body;
+
+    if (!Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({
+        message: 'No answers were submitted.'
+      });
+    }
+
+    const existingResults = await AssessmentResult.find({
+      studentId: student._id,
+      schoolId: student.schoolId,
+      studentClass: student.studentClass
+    }).sort({ attemptNumber: 1 });
+
+    if (existingResults.length >= 2) {
+      return res.status(409).json({
+        message: 'You have used both attempts for this assessment. You can no longer submit'
+      });
+    }
+
+    const attemptNumber = existingResults.length + 1;
+    const submittedAnswers = [];
+    let score = 0;
+    let totalMarks = 0;
+
+    for (const answer of answers) {
+      const question = await Question.findOne({
+        _id: answer.questionId,
+        schoolId: student.schoolId,
+        studentClass: student.studentClass,
+        isActive: true
+      });
+
+      if (!question) {
+        return res.status(400).json({
+          message: 'An invalid question was submitted.'
+        });
+      }
+
+      const marks = Number(question.marks) || 0;
+      totalMarks += marks;
+
+      let isCorrect = false;
+
+      if (question.questionType === 'mcq') {
+        isCorrect =
+          typeof answer.selectedOption === 'string' &&
+          answer.selectedOption === question.correctAnswer;
+      } else if (question.questionType === 'true_false') {
+        isCorrect =
+          typeof answer.selectedOption === 'string' &&
+          answer.selectedOption === question.trueFalseAnswer;
+      } else {
+        return res.status(400).json({
+          message: 'Automatic marking is not yet available for this question type.'
+        });
+      }
+
+      const marksAwarded = isCorrect ? marks : 0;
+      score += marksAwarded;
+
+      submittedAnswers.push({
+        questionId: question._id,
+        selectedOption: answer.selectedOption ?? null,
+        isCorrect,
+        marksAwarded
+      });
+    }
+
+    const result = await AssessmentResult.create({
+      studentId: student._id,
+      schoolId: student.schoolId,
+      studentClass: student.studentClass,
+      attemptNumber,
+      answers: submittedAnswers,
+      score,
+      totalMarks
+    });
+
+    return res.status(201).json({
+      message: `Attempt ${attemptNumber} submitted successfully.`,
+      attemptNumber: result.attemptNumber,
+      score: result.score,
+      totalMarks: result.totalMarks
+    });
+  }    catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: 'You have already used this attempt.'
+      });
+    }
+
+    console.error('Submit student answers error:', error);
+
+    return res.status(500).json({
+      message: 'Unable to submit answers. Please try again.'
+    });
+  }
+}
+
 module.exports = {
   generateCode,
   registerStudent,
+  loginStudent,
+  getCurrentStudent,
+  getStudentQuestions,
+  submitStudentAnswers,
   importStudents,
   listStudents,
   archiveStudent,
   restoreStudent,
-  deleteStudent, 
+  deleteStudent,
   editStudent
 };
 

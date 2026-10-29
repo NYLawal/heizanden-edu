@@ -6,7 +6,11 @@ const router = express.Router();
 
 const {
   generateCode,
-   registerStudent,
+  registerStudent,
+  loginStudent,
+  getCurrentStudent,
+  getStudentQuestions,
+  submitStudentAnswers,
   importStudents,
   listStudents,
   archiveStudent,
@@ -49,6 +53,27 @@ function requireTeacher(req, res, next) {
 // Generate a code for one student
 router.post('/generate-code', requireTeacher, generateCode);
 router.post('/register', registerStudent);
+router.post('/login', loginStudent);
+router.get('/me', getCurrentStudent);
+router.get('/questions', getStudentQuestions);
+router.post('/submit-answers', submitStudentAnswers);
+router.post('/logout', (req, res) => {
+  if (!req.session) {
+    return res.status(200).json({ message: 'Logged out.' });
+  }
+
+  req.session.destroy((error) => {
+    if (error) {
+      console.error('Student logout error:', error.message);
+      return res.status(500).json({
+        message: 'Unable to log out. Please try again.'
+      });
+    }
+
+    res.clearCookie('connect.sid');
+    return res.status(200).json({ message: 'Logged out successfully.' });
+  });
+});
 
 // Import students from a CSV file
 router.post(

@@ -4,7 +4,8 @@ const router = express.Router();
 const wordUpload = require('../middleware/wordUpload');
 
 const {
-  previewWordQuestions
+  previewWordQuestions,
+   importApprovedWordQuestions
 } = require('../controllers/wordImportController');
 
 const {
@@ -41,6 +42,11 @@ router.post(
   requireTeacher,
   wordUpload.single('wordFile'),
   previewWordQuestions
+);
+router.post(
+  '/import-word',
+  requireTeacher,
+  importApprovedWordQuestions
 );
 
 module.exports = router;

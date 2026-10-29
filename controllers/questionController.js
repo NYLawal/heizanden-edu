@@ -111,7 +111,7 @@ async function addQuestion(req, res) {
     }
 
     const question = await Question.create({
-      schoolId: 'default',
+      schoolId: process.env.SCHOOL_ID,
       studentClass,
       topic: topic.trim(),
       questionType,
@@ -297,7 +297,7 @@ async function updateQuestion(req, res) {
     };
 
     const question = await Question.findOneAndUpdate(
-      { _id: req.params.id, schoolId: 'default' },
+      { _id: req.params.id, schoolId: process.env.SCHOOL_ID },
       { $set: update },
       { returnDocument: 'after', runValidators: true }
     );
@@ -324,7 +324,7 @@ async function deleteQuestion(req, res) {
   try {
     const question = await Question.findOneAndDelete({
       _id: req.params.id,
-      schoolId: 'default'
+      schoolId: process.env.SCHOOL_ID
     });
 
     if (!question) {
@@ -347,8 +347,8 @@ async function deleteQuestion(req, res) {
 async function listQuestions(req, res) {
   try {
     const filter = {
-      schoolId: 'default'
-    };
+  schoolId: process.env.SCHOOL_ID
+};
 
     if (req.query.studentClass) {
       if (!validClasses.includes(req.query.studentClass)) {

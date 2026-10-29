@@ -20,68 +20,99 @@
 
   <main>
     <section class="login-options">
-  <section id="loginPanel" class="panel">
-    <h2>Teacher Login</h2>
-    <p>Enter your teacher password to continue.</p>
-    <form id="loginForm">
-      <label for="password">Teacher password</label>
-      <input id="password" type="password" required autocomplete="current-password">
-      <button type="submit">Log in</button>
-    </form>
-    <div id="loginMessage" class="message" role="status"></div>
-  </section>
+      <section id="loginPanel" class="panel">
+        <h2>Teacher Login</h2>
+        <p>Enter your teacher password to continue.</p>
+        <form id="loginForm">
+          <label for="password">Teacher password</label>
+          <input id="password" type="password" required autocomplete="current-password">
+          <button type="submit">Log in</button>
+        </form>
+        <div id="loginMessage" class="message" role="status"></div>
+      </section>
 
-  <section id="studentPanel" class="panel">
-    <h2>Student Login / Register</h2>
-    <p>Register with your school details or log in using your access code.</p>
+      <section id="studentPanel" class="panel">
+        <h2>Student Login / Register</h2>
+        <p>Register with your school details or log in using your access code.</p>
 
-    <div class="student-actions">
-      <button type="button" id="showStudentLogin">Student Login</button>
-      <button type="button" id="showStudentRegister">Register</button>
-    </div>
+        <div class="student-actions">
+          <button type="button" id="showStudentLogin">Student Login</button>
+          <button type="button" id="showStudentRegister">Register</button>
+        </div>
 
-    <div id="studentMessage" class="message" role="status"></div>
+        <div id="studentMessage" class="message" role="status"></div>
 
-    <form id="studentLoginForm" hidden>
-      <h3>Student Login</h3>
-      <label for="studentAccessCode">Your access code</label>
-      <input id="studentAccessCode" type="text" required maxlength="20"
-             autocomplete="off" placeholder="Enter your access code">
-      <button type="submit">Access Assessments</button>
-    </form>
+        <form id="studentLoginForm" hidden>
+          <h3>Student Login</h3>
+          <label for="studentAccessCode">Your access code</label>
+          <input id="studentAccessCode" type="text" required maxlength="20" autocomplete="off"
+            placeholder="Enter your access code">
+          <button type="submit">Access Assessments</button>
+        </form>
 
-    <form id="studentRegisterForm" hidden>
-      <h3>Student Registration</h3>
+        <form id="studentRegisterForm" hidden>
+          <h3>Student Registration</h3>
 
-      <label for="registerStudentName">Full name</label>
-      <input id="registerStudentName" type="text" required maxlength="120"
-             placeholder="Enter your full name">
+          <label for="registerStudentName">Full name</label>
+          <input id="registerStudentName" type="text" required maxlength="120" placeholder="Enter your full name">
 
-      <label for="registerAdmissionNumber">Admission number</label>
-      <input id="registerAdmissionNumber" type="text" required maxlength="50"
-             placeholder="Enter your admission number">
+          <label for="registerAdmissionNumber">Admission number</label>
+          <input id="registerAdmissionNumber" type="text" required maxlength="50"
+            placeholder="Enter your admission number">
 
-      <label for="registerStudentClass">Class</label>
-      <select id="registerStudentClass" required>
-        <option value="">Select class</option>
-        <option>JSS1</option>
-        <option>JSS2</option>
-        <option>JSS3</option>
-        <option>SS1</option>
-        <option>SS2</option>
-        <option>SS3</option>
-      </select>
+          <label for="registerStudentClass">Class</label>
+          <select id="registerStudentClass" required>
+            <option value="">Select class</option>
+            <option>JSS1</option>
+            <option>JSS2</option>
+            <option>JSS3</option>
+            <option>SS1</option>
+            <option>SS2</option>
+            <option>SS3</option>
+          </select>
 
-      <label for="registerSchoolId">School ID</label>
-      <input id="registerSchoolId" type="text" required maxlength="80"
-             placeholder="Enter the School ID given by your school">
+          <label for="registerSchoolId">School ID</label>
+          <input id="registerSchoolId" type="text" required maxlength="80"
+            placeholder="Enter the School ID given by your school">
 
-      <button type="submit">Register and Generate Access Code</button>
-    </form>
+          <button type="submit">Register and Generate Access Code</button>
+        </form>
 
-    <div id="studentAccessCodeResult" class="message" role="status" hidden></div>
-  </section>
-</section>
+        <div id="studentAccessCodeResult" class="message" role="status" hidden></div>
+        <section id="studentDashboard" class="hidden">
+          <h2>Student Dashboard</h2>
+          <p id="studentWelcome"></p>
+
+          <div class="field">
+            <label for="dashboardClass">Your class</label>
+            <select id="dashboardClass">
+              <option value="">Select your class</option>
+              <option>JSS1</option>
+              <option>JSS2</option>
+              <option>JSS3</option>
+              <option>SS1</option>
+              <option>SS2</option>
+              <option>SS3</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="dashboardSubject">Subject</label>
+            <select id="dashboardSubject">
+              <option value="Digital Technologies">Digital Technologies</option>
+            </select>
+          </div>
+
+          <div class="panel">
+            <h3>Available Assessments</h3>
+            <p id="assessmentMessage">Choose your class to view available assessments.</p>
+            <button type="button" id="viewAssessmentsBtn">View Assessments</button>
+          </div>
+
+          <button type="button" id="studentLogoutBtn">Log Out</button>
+        </section>
+      </section>
+    </section>
 
 
     <section id="dashboard" class="hidden">
@@ -192,6 +223,23 @@
             <input type="file" id="wordFile" name="wordFile"
               accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
           </div>
+          <div class="field">
+            <label for="importClass">Class</label>
+            <select id="importClass" required>
+              <option value="">Select class</option>
+              <option value="JSS1">JSS1</option>
+              <option value="JSS2">JSS2</option>
+              <option value="JSS3">JSS3</option>
+              <option value="SS1">SS1</option>
+              <option value="SS2">SS2</option>
+              <option value="SS3">SS3</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="importTopic">Topic</label>
+            <input type="text" id="importTopic" placeholder="Enter the topic" required>
+          </div>
           <button type="submit" class="primary">Preview Questions</button>
         </form>
 
@@ -200,6 +248,22 @@
         <div id="wordImportPreview" hidden>
           <h3>Extracted Text</h3>
           <pre id="wordImportText" style="white-space: pre-wrap; overflow-wrap: anywhere;"></pre>
+
+          <h3>Parsed Questions</h3>
+          <div id="parsedQuestionsPreview"></div>
+          <div id="importReviewSummary" class="note" hidden></div>
+
+          <div class="button-row">
+            <button type="button" id="reviewImportBtn" class="secondary">
+              Review Before Import
+            </button>
+            <button type="button" id="confirmImportBtn" class="primary" disabled>
+              Import Approved Questions
+            </button>
+          </div>
+
+          <div id="importReviewMessage" role="status" aria-live="polite"></div>
+
           <button type="button" id="clearWordPreview" class="secondary">Clear Preview</button>
         </div>
       </section>
@@ -311,11 +375,13 @@
 
   <script>
     let teacherPassword = '';
+    let currentStudent = null;
     let students = [];
 
     const $ = id => document.getElementById(id);
     const wordImportForm = $('wordImportForm');
 
+    let parsedImportQuestions = [];
     wordImportForm.addEventListener('submit', async event => {
       event.preventDefault();
 
@@ -352,6 +418,94 @@
         }
 
         textOutput.textContent = result.text;
+        parsedImportQuestions = result.parsedQuestions || [];
+        const parsedOutput = $('parsedQuestionsPreview');
+        parsedOutput.innerHTML = '';
+
+        if (result.parsedQuestions && result.parsedQuestions.length) {
+          result.parsedQuestions.forEach((question, index) => {
+            const card = document.createElement('div');
+            card.className = 'panel';
+            card.style.marginTop = '12px';
+
+            const heading = document.createElement('h4');
+            heading.textContent = `Question ${question.questionNumber ?? index + 1}`;
+            card.appendChild(heading);
+
+            const questionText = document.createElement('p');
+            questionText.textContent = question.questionText;
+            card.appendChild(questionText);
+
+            ['A', 'B', 'C', 'D'].forEach(letter => {
+              const option = document.createElement('p');
+              option.textContent = `${letter}. ${question.options[letter]}`;
+              card.appendChild(option);
+            });
+
+            const answer = document.createElement('p');
+            if (question.questionType === 'mcq') {
+              const answerLabel = document.createElement('label');
+              answerLabel.textContent = 'Correct answer:';
+
+              const answerSelect = document.createElement('select');
+              answerSelect.innerHTML = `
+    <option value="">Select answer</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+    <option value="D">D</option>
+  `;
+
+              answerSelect.value = question.correctAnswer || '';
+              answerSelect.addEventListener('change', () => {
+                question.correctAnswer = answerSelect.value || null;
+              });
+
+              answer.appendChild(answerLabel);
+              answer.appendChild(answerSelect);
+            } else if (question.questionType === 'true_false') {
+              const answerLabel = document.createElement('label');
+              answerLabel.textContent = 'Correct answer:';
+
+              const answerSelect = document.createElement('select');
+              answerSelect.innerHTML = `
+    <option value="">Select answer</option>
+    <option value="True">True</option>
+    <option value="False">False</option>
+  `;
+
+              answerSelect.value = question.trueFalseAnswer || '';
+              answerSelect.addEventListener('change', () => {
+                question.trueFalseAnswer = answerSelect.value || null;
+              });
+
+              answer.appendChild(answerLabel);
+              answer.appendChild(answerSelect);
+            } else {
+              const answerLabel = document.createElement('label');
+              answerLabel.textContent = 'Expected answer / marking guide:';
+
+              const answerInput = document.createElement('textarea');
+              answerInput.rows = 3;
+              answerInput.style.width = '100%';
+              answerInput.placeholder = 'Enter the expected answer or marking guide';
+
+              answerInput.value = question.answerKey || '';
+              answerInput.addEventListener('input', () => {
+                question.answerKey = answerInput.value;
+              });
+
+              answer.appendChild(answerLabel);
+              answer.appendChild(answerInput);
+            }
+            card.appendChild(answer);
+
+            parsedOutput.appendChild(card);
+          });
+        } else {
+          parsedOutput.textContent =
+            'No questions matched the expected format. Check the warnings and Word document formatting.';
+        }
         preview.hidden = false;
         message.textContent = result.message;
 
@@ -397,6 +551,106 @@
       element.textContent = message;
       element.className = 'message ' + (success ? 'success' : 'error');
     }
+    // Show the requested student form
+    $('showStudentLogin').addEventListener('click', () => {
+      $('studentLoginForm').hidden = false;
+      $('studentRegisterForm').hidden = true;
+      $('studentAccessCodeResult').hidden = true;
+      $('studentMessage').textContent = '';
+    });
+
+    $('showStudentRegister').addEventListener('click', () => {
+      $('studentRegisterForm').hidden = false;
+      $('studentLoginForm').hidden = true;
+      $('studentAccessCodeResult').hidden = true;
+      $('studentMessage').textContent = '';
+    });
+
+    // Register a student
+    $('studentRegisterForm').addEventListener('submit', async event => {
+      event.preventDefault();
+
+      const button = event.submitter;
+      button.disabled = true;
+      button.textContent = 'Registering...';
+
+      $('studentMessage').textContent = '';
+      $('studentAccessCodeResult').hidden = true;
+
+      try {
+        const response = await fetch('/students/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: $('registerStudentName').value.trim(),
+            admissionNumber: $('registerAdmissionNumber').value.trim(),
+            studentClass: $('registerStudentClass').value,
+            schoolId: $('registerSchoolId').value.trim()
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Registration failed.');
+        }
+
+        const result = $('studentAccessCodeResult');
+
+        result.textContent =
+          `Registration successful!\n\n` +
+          `Your access code: ${data.accessCode}\n\n` +
+          `Keep this code safe and do not share it with others.\n` +
+          `You can use this code to log in now or return later to take your assessments.`;
+
+        result.hidden = false;
+        result.style.whiteSpace = 'pre-line';
+        $('studentMessage').textContent = '';
+        $('studentRegisterForm').hidden = true;
+
+        $('studentRegisterForm').reset();
+      } catch (error) {
+        showMessage('studentMessage', error.message);
+
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Register and Generate Access Code';
+      }
+    });
+    $('studentLoginForm').addEventListener('submit', async event => {
+      event.preventDefault();
+
+      const button = event.submitter;
+      button.disabled = true;
+      button.textContent = 'Logging in...';
+      $('studentMessage').textContent = '';
+
+      try {
+        const response = await fetch('/students/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accessCode: $('studentAccessCode').value.trim()
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Login failed.');
+        }
+
+        window.location.href = '/student-dashboard.html';
+
+      } catch (error) {
+        showMessage('studentMessage', error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Access Assessments';
+      }
+    });
 
     $('loginForm').addEventListener('submit', async event => {
       event.preventDefault();
@@ -1001,6 +1255,113 @@
         });
 
     })();
+    $('reviewImportBtn').addEventListener('click', () => {
+      const summary = $('importReviewSummary');
+      const message = $('importReviewMessage');
+      const importButton = $('confirmImportBtn');
+
+      if (!parsedImportQuestions.length) {
+        summary.hidden = false;
+        summary.textContent =
+          'No questions are available to review. Upload a Word document first.';
+        message.textContent = '';
+        importButton.disabled = true;
+        return;
+      }
+
+      const issues = [];
+
+      parsedImportQuestions.forEach((question, index) => {
+        const number = question.questionNumber ?? index + 1;
+
+        if (!question.questionText?.trim()) {
+          issues.push(`Question ${number}: question text is missing.`);
+        }
+
+        for (const letter of ['A', 'B', 'C', 'D']) {
+          if (!question.options?.[letter]?.trim()) {
+            issues.push(`Question ${number}: option ${letter} is missing.`);
+          }
+        }
+
+        if (!['A', 'B', 'C', 'D'].includes(question.correctAnswer)) {
+          issues.push(`Question ${number}: choose the correct answer.`);
+        }
+      });
+
+      summary.hidden = false;
+
+      if (issues.length) {
+        summary.textContent =
+          `${parsedImportQuestions.length} questions found. ${issues.length} issue(s) need attention.`;
+        message.textContent = issues.join(' ');
+        importButton.disabled = true;
+      } else {
+        summary.textContent =
+          `Review passed: all ${parsedImportQuestions.length} questions have text, four options, and a selected answer.`;
+
+        message.textContent =
+          'Please check the questions and answer key carefully. Nothing has been saved yet.';
+
+        importButton.disabled = false;
+      }
+    });
+    $('confirmImportBtn').addEventListener('click', async () => {
+      const message = $('importReviewMessage');
+      const importButton = $('confirmImportBtn');
+
+      if (!parsedImportQuestions.length) {
+        message.textContent = 'Please preview and review questions first.';
+        return;
+      }
+
+      const studentClass = $('importClass').value;
+      const topic = $('importTopic').value.trim();
+
+      if (!studentClass || !topic) {
+        message.textContent = 'Please select a class and enter a topic.';
+        return;
+      }
+
+      importButton.disabled = true;
+      importButton.textContent = 'Importing...';
+      message.textContent = 'Saving the approved questions...';
+
+      try {
+        const response = await fetch('/questions/import-word', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-teacher-password': teacherPassword
+          },
+          body: JSON.stringify({
+            questions: parsedImportQuestions,
+            studentClass,
+            topic
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          const details = Array.isArray(result.issues)
+            ? ' ' + result.issues.join(' ')
+            : '';
+
+          throw new Error((result.message || 'Import failed.') + details);
+        }
+
+        message.textContent = result.message;
+        parsedImportQuestions = [];
+        $('parsedQuestionsPreview').innerHTML = '';
+        $('importReviewSummary').hidden = true;
+      } catch (error) {
+        message.textContent = error.message;
+      } finally {
+        importButton.textContent = 'Import Approved Questions';
+        importButton.disabled = true;
+      }
+    });
   </script>
 </body>
 

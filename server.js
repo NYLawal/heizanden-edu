@@ -1,6 +1,7 @@
-
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
+const session = require('express-session');
 require('dotenv').config();
 
 const studentRoutes = require('./routes/studentRoutes');
@@ -10,6 +11,32 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 2 * 60 * 60 * 1000
+  }
+}));
+function requireStudent(req, res, next) {
+  if (!req.session || !req.session.studentId) {
+    return res.redirect('/');
+  }
+
+  next();
+}
+
+app.get(
+  '/student-dashboard.html',
+  requireStudent,
+  (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'student-dashboard.html'));
+  }
+);
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {

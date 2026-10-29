@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | Heizanden EduAssess</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fc;
+            color: #172033;
+            margin: 0;
+            padding: 24px;
+        }
+
+        main {
+            max-width: 760px;
+            margin: 30px auto;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            margin-bottom: 20px;
+            border-radius: 14px;
+            border: 1px solid #dce4f2;
+        }
+
+        label,
+        select {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        select,
+        button {
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 8px;
+        }
+
+        button {
+            cursor: pointer;
+            border: 0;
+            background: #2456d8;
+            color: white;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+        }
+
+        #studentLogoutBtn {
+            margin-top: 0;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 8px 0;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .answer-option input[type="radio"] {
+            flex: 0 0 auto;
+            width: auto;
+            margin: 4px 0 0;
+        }
+
+        .attempt-instructions {
+            background: #fff4d6;
+            border-left: 4px solid #d99a16;
+            padding: 12px 15px;
+            margin: 16px 0;
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <section class="panel">
+            <div class="dashboard-header">
+                <h1>Student Dashboard</h1>
+                <button type="button" id="studentLogoutBtn">Log Out</button>
+            </div>
+
+            <p id="studentWelcome">Welcome!</p>
+            <p>Verify that your class is displayed and click the button to view your assessments.</p>
+        </section>
+
+        <section class="panel">
+            <h2>Choose Your Assessment</h2>
+
+            <label for="dashboardClass">Class</label>
+            <select id="dashboardClass">
+                <option value="">Select your class</option>
+                <option>JSS1</option>
+                <option>JSS2</option>
+                <option>JSS3</option>
+                <option>SS1</option>
+                <option>SS2</option>
+                <option>SS3</option>
+            </select>
+
+            <label for="dashboardSubject">Subject</label>
+            <select id="dashboardSubject">
+                <option value="Digital Technologies">Digital Technologies</option>
+            </select>
+
+            <h3>Available Assessments</h3>
+            <p id="assessmentMessage">Select your class to continue.</p>
+            <button type="button" id="viewAssessmentsBtn">
+                View Assessments
+            </button>
+            <div id="assessmentArea" hidden>
+                <h3 id="assessmentTitle">Digital Technologies Assessment</h3>
+                <p class="attempt-instructions">
+                    <strong>Assessment instructions:</strong>
+                    Read each question carefully and review your answers before submitting.
+                    You are allowed only two attempts: your first attempt and one retake.
+                    After your second submission, you cannot submit again.
+                </p>
+                <p id="questionProgress"></p>
+                <div id="questionContainer"></div>
+
+                <button type="button" id="nextQuestionBtn" hidden>
+                    Next Question
+                </button>
+
+                <p id="quizMessage" role="status"></p>
+
+                <button type="button" id="submitAnswersBtn" hidden>
+                    Submit Answers
+                </button>
+            </div>
+        </section>
+
+
+    </main>
+    <script>
+        async function loadStudentDetails() {
+            try {
+                const response = await fetch('/students/me');
+
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Unable to load student details.');
+                }
+
+                const data = await response.json();
+                const student = data.student;
+
+                document.getElementById('studentWelcome').textContent =
+                    `Welcome, ${student.name}`;
+
+                const classSelect = document.getElementById('dashboardClass');
+                classSelect.value = student.studentClass;
+                classSelect.disabled = true;
+            } catch (error) {
+                console.error(error);
+                document.getElementById('studentWelcome').textContent =
+                    'Unable to load your details. Please log in again.';
+            }
+        }
+
+        loadStudentDetails();
+        document.getElementById('viewAssessmentsBtn').addEventListener('click', () => {
+            document.getElementById('submitAnswersBtn').hidden = false;
+        });
+
+        document.getElementById('submitAnswersBtn').addEventListener('click', async () => {
+            const cards = document.querySelectorAll('#questionContainer > div');
+            const answers = [];
+
+            cards.forEach((card, index) => {
+                const selected = card.querySelector('input[type="radio"]:checked');
+
+                answers.push({
+                    questionId: card.dataset.questionId,
+                    questionNumber: index + 1,
+                    selectedOption: selected
+                        ? String.fromCharCode(65 + Number(selected.value))
+                        : null
+                });
+            });
+
+            const message = document.getElementById('quizMessage');
+            const submitButton = document.getElementById('submitAnswersBtn');
+
+            submitButton.disabled = true;
+            message.textContent = 'Submitting answers...';
+
+            try {
+                const response = await fetch('/students/submit-answers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ answers })
+                });
+
+                const data = await response.json();
+
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Submission failed.');
+                }
+
+                message.textContent =
+                    `${data.message} Score: ${data.score}/${data.totalMarks}`;
+            } catch (error) {
+                console.error('Submission error:', error);
+                message.textContent = error.message || 'Unable to submit answers. Please try again.';
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+        document.getElementById('viewAssessmentsBtn').addEventListener('click', async () => {
+            const message = document.getElementById('assessmentMessage');
+            const area = document.getElementById('assessmentArea');
+
+            message.textContent = 'Loading assessments...';
+
+            try {
+                const response = await fetch('/students/questions');
+
+                if (response.status === 401) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Unable to load assessments.');
+                }
+
+                const data = await response.json();
+
+                area.hidden = false;
+                message.textContent = data.count
+                    ? `${data.count} questions available for ${data.studentClass}.`
+                    : `No questions are available for ${data.studentClass} yet.`;
+
+                const container = document.getElementById('questionContainer');
+                container.innerHTML = '';
+
+                data.questions.forEach((q, i) => {
+                    const card = document.createElement('div');
+                    card.dataset.questionId = q._id;
+                    card.style.marginBottom = '20px';
+                    card.style.padding = '15px';
+                    card.style.border = '1px solid #ccc';
+                    card.style.borderRadius = '8px';
+
+                    const heading = document.createElement('h4');
+                    heading.textContent = `Question ${i + 1} — ${q.questionType}`;
+                    card.appendChild(heading);
+
+                    const topic = document.createElement('p');
+                    topic.textContent = q.topic;
+                    card.appendChild(topic);
+
+                    const question = document.createElement('p');
+                    question.textContent = q.questionText;
+                    card.appendChild(question);
+
+                    if (q.questionType === 'mcq' && Array.isArray(q.options)) {
+                        const optionsList = document.createElement('div');
+
+                        q.options.forEach((option, optionIndex) => {
+                            const label = document.createElement('label');
+                            label.className = 'answer-option';
+
+                            const radio = document.createElement('input');
+                            radio.type = 'radio';
+                            radio.name = `question-${i}`;
+                            radio.value = optionIndex;
+
+                            label.appendChild(radio);
+                            label.appendChild(
+                                document.createTextNode(
+                                    ` ${String.fromCharCode(65 + optionIndex)}. ${option}`
+                                )
+                            );
+                            optionsList.appendChild(label);
+                        });
+
+                        card.appendChild(optionsList);
+                    }
+                    const selectedAnswer = document.createElement('p');
+                    selectedAnswer.textContent = 'Your answer: Not selected';
+                    selectedAnswer.style.marginTop = '12px';
+                    card.appendChild(selectedAnswer);
+
+                    card.querySelectorAll('input[type="radio"]').forEach(radio => {
+                        radio.addEventListener('change', () => {
+                            const chosen = String.fromCharCode(65 + Number(radio.value));
+                            selectedAnswer.textContent = `Your answer: ${chosen}`;
+                        });
+                    });
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error(error);
+                message.textContent = 'Unable to load assessments. Please try again.';
+            }
+        });
+        document.getElementById('studentLogoutBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/students/logout', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Logout failed.');
+                }
+
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Unable to log out. Please try again.');
+            }
+        });
+    </script>
+</body>
+
+</html>
