@@ -6,6 +6,7 @@ const router = express.Router();
 
 const {
   generateCode,
+   registerStudent,
   importStudents,
   listStudents,
   archiveStudent,
@@ -47,6 +48,7 @@ function requireTeacher(req, res, next) {
 
 // Generate a code for one student
 router.post('/generate-code', requireTeacher, generateCode);
+router.post('/register', registerStudent);
 
 // Import students from a CSV file
 router.post(

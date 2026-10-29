@@ -2,6 +2,7 @@
 const crypto = require('crypto');
 const { parse } = require('csv-parse/sync');
 const Student = require('../models/Student');
+const School = require('../models/School');
 
 const validClasses = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
 
@@ -169,7 +170,6 @@ async function importStudents(req, res) {
     });
   }
 }
-
 
 async function listStudents(req, res) {
   try {
@@ -350,9 +350,82 @@ async function editStudent(req, res) {
   }
 }
 
+async function registerStudent(req, res) {
+  try {
+    const { name, admissionNumber, studentClass, schoolId } = req.body;
+
+    if (
+      typeof name !== 'string' ||
+      !name.trim() ||
+      typeof admissionNumber !== 'string' ||
+      !admissionNumber.trim() ||
+      typeof schoolId !== 'string' ||
+      !schoolId.trim() ||
+      !validClasses.includes(studentClass)
+    ) {
+      return res.status(400).json({
+        message: 'Enter your name, admission number, class, and School ID.'
+      });
+    }
+
+    const cleanSchoolId = schoolId.trim().toUpperCase();
+    const cleanAdmissionNumber = admissionNumber.trim();
+
+    const school = await School.findOne({
+      schoolId: cleanSchoolId,
+      isActive: true
+    });
+
+    if (!school) {
+      return res.status(400).json({
+        message: 'School ID not found or school is inactive. Check with your school.'
+      });
+    }
+
+    const existingStudent = await Student.findOne({
+      schoolId: cleanSchoolId,
+      admissionNumber: cleanAdmissionNumber
+    });
+
+    if (existingStudent) {
+      return res.status(409).json({
+        message: 'This admission number is already registered in your school.'
+      });
+    }
+
+    const accessCode = await createAccessCode();
+
+    const student = await Student.create({
+      name: name.trim(),
+      admissionNumber: cleanAdmissionNumber,
+      studentClass,
+      schoolId: cleanSchoolId,
+      accessCode
+    });
+
+    return res.status(201).json({
+      message: 'Registration successful. Keep your access code safe; you will need it to access your assessments.',
+      accessCode: student.accessCode
+    });
+  } catch (error) {
+    console.error('Student registration error:', error.message);
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: 'This admission number or access code is already in use. Please try again.'
+      });
+    }
+
+    return res.status(500).json({
+      message: 'Registration failed. Please try again later.'
+    });
+  }
+}
+
 
 module.exports = {
   generateCode,
+  registerStudent,
   importStudents,
   listStudents,
   archiveStudent,
