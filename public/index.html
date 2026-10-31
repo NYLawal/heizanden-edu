@@ -374,6 +374,7 @@
   </main>
 
   <script>
+    const API_URL = 'https://heizanden-eduassess.onrender.com';
     let teacherPassword = '';
     let currentStudent = null;
     let students = [];
@@ -403,7 +404,7 @@
         const formData = new FormData();
         formData.append('wordFile', file);
 
-        const response = await fetch('/questions/import-word/preview', {
+        const response = await fetch(API_URL + '/questions/import-word/preview', {
           method: 'POST',
           headers: {
             'x-teacher-password': teacherPassword
@@ -530,7 +531,7 @@
         ...(options.headers || {})
       };
 
-      const response = await fetch('/students' + path, {
+      const response = await fetch(API_URL + '/students' + path, {
         ...options,
         headers
       });
@@ -578,7 +579,7 @@
       $('studentAccessCodeResult').hidden = true;
 
       try {
-        const response = await fetch('/students/register', {
+        fetch(API_URL + '/students/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -628,7 +629,7 @@
       $('studentMessage').textContent = '';
 
       try {
-        const response = await fetch('/students/login', {
+       fetch(API_URL + '/students/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
