@@ -629,7 +629,7 @@
       $('studentMessage').textContent = '';
 
       try {
-       const response = await fetch(API_URL + '/students/login', {
+        const response = await fetch(API_URL + '/students/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1023,8 +1023,8 @@
 
           const response = await fetch(
             editingQuestionId
-              ? `/questions/${editingQuestionId}`
-              : '/questions',
+              ? API_URL + `/questions/${editingQuestionId}`
+              : API_URL + '/questions',
             {
               method: editingQuestionId ? 'PUT' : 'POST',
               headers: {
@@ -1118,7 +1118,7 @@
         params.set('limit', questionsPerPage);
 
         try {
-          const response = await fetch('/questions?' + params.toString(), {
+          const response = await fetch(API_URL + '/questions?' + params.toString(), {
             headers: { 'x-teacher-password': teacherPassword }
           });
 
@@ -1182,7 +1182,7 @@
 
               try {
                 const response = await fetch(
-                  '/questions/' + encodeURIComponent(question._id),
+                  API_URL + '/questions/' + encodeURIComponent(question._id),
                   {
                     method: 'DELETE',
                     headers: {
@@ -1329,7 +1329,7 @@
       message.textContent = 'Saving the approved questions...';
 
       try {
-        const response = await fetch('/questions/import-word', {
+        const response = await fetch(API_URL + '/questions/import-word', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

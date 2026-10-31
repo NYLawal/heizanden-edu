@@ -156,9 +156,10 @@
 
     </main>
     <script>
+        const API_URL = 'https://heizanden-eduassess.onrender.com';
         async function loadStudentDetails() {
             try {
-                const response = await fetch('/students/me');
+                const response = await fetch(API_URL + '/students/me');
 
                 if (response.status === 401) {
                     window.location.href = '/';
@@ -213,7 +214,7 @@
             message.textContent = 'Submitting answers...';
 
             try {
-                const response = await fetch('/students/submit-answers', {
+                const response = await fetch(API_URL + '/students/submit-answers', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -248,7 +249,7 @@
             message.textContent = 'Loading assessments...';
 
             try {
-                const response = await fetch('/students/questions');
+                const response = await fetch(API_URL + '/students/questions');
 
                 if (response.status === 401) {
                     window.location.href = '/';
@@ -333,7 +334,7 @@
         });
         document.getElementById('studentLogoutBtn').addEventListener('click', async () => {
             try {
-                const response = await fetch('/students/logout', {
+                const response = await fetch(API_URL + '/students/logout', {
                     method: 'POST'
                 });
 
