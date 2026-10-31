@@ -359,3 +359,9 @@ th {
 .answer-option span {
     line-height: 1.5;
 }
+.question-topic {
+    color: #999;
+    font-size: 12px;
+    font-weight: normal;
+    margin-bottom: 6px;
+}
