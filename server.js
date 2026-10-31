@@ -17,16 +17,19 @@ app.use(cors({
     'https://heizanden-eduassess.netlify.app',
     'http://localhost:3000',
     'http://127.0.0.1:3000'
-  ]
+  ],
+  credentials: true
 }));
+
+app.set('trust proxy', 1);
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none',
+    secure: true,
     maxAge: 2 * 60 * 60 * 1000
   }
 }));
