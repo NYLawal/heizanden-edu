@@ -57,8 +57,8 @@
           <input id="registerStudentName" type="text" required maxlength="120" placeholder="Enter your full name">
 
           <label for="registerAdmissionNumber">Admission number</label>
-          <input id="registerAdmissionNumber" type="text" required maxlength="50"
-            placeholder="Enter your admission number">
+          <input id="registerAdmissionNumber" type="text" maxlength="15"
+            placeholder="Skip this if you don't have one yet">
 
           <label for="registerStudentClass">Class</label>
           <select id="registerStudentClass" required>
@@ -374,7 +374,7 @@
   </main>
 
   <script>
-    const API_URL = '/api';
+    const API_URL = window.location.hostname === 'localhost' ? '' : '/api';
     let teacherPassword = '';
     let currentStudent = null;
     let students = [];

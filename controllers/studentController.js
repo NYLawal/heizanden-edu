@@ -25,26 +25,26 @@ async function generateCode(req, res) {
     if (
       typeof name !== 'string' ||
       !name.trim() ||
-      typeof admissionNumber !== 'string' ||
-      !admissionNumber.trim() ||
       !validClasses.includes(studentClass)
     ) {
       return res.status(400).json({
-        message: 'Enter a valid student name, admission number, and class.'
+        message: 'Enter a valid student name and class.'
       });
     }
 
-    const cleanAdmissionNumber = admissionNumber.trim();
+    const cleanAdmissionNumber = admissionNumber?.trim() || null;
 
-    const existingStudent = await Student.findOne({
-      schoolId,
-      admissionNumber: cleanAdmissionNumber
-    });
-
-    if (existingStudent) {
-      return res.status(409).json({
-        message: 'This admission number is already registered in this school.'
+    if (cleanAdmissionNumber) {
+      const existingStudent = await Student.findOne({
+        schoolId,
+        admissionNumber: cleanAdmissionNumber
       });
+
+      if (existingStudent) {
+        return res.status(409).json({
+          message: 'This admission number is already registered in this school.'
+        });
+      }
     }
 
     const student = await Student.create({
@@ -358,19 +358,17 @@ async function registerStudent(req, res) {
     if (
       typeof name !== 'string' ||
       !name.trim() ||
-      typeof admissionNumber !== 'string' ||
-      !admissionNumber.trim() ||
       typeof schoolId !== 'string' ||
       !schoolId.trim() ||
       !validClasses.includes(studentClass)
     ) {
       return res.status(400).json({
-        message: 'Enter your name, admission number, class, and School ID.'
+        message: 'Enter your name, class, and School ID.'
       });
     }
 
     const cleanSchoolId = schoolId.trim().toUpperCase();
-    const cleanAdmissionNumber = admissionNumber.trim();
+    const cleanAdmissionNumber = admissionNumber?.trim() || null;
 
     const school = await School.findOne({
       schoolId: cleanSchoolId,
@@ -383,15 +381,17 @@ async function registerStudent(req, res) {
       });
     }
 
-    const existingStudent = await Student.findOne({
-      schoolId: cleanSchoolId,
-      admissionNumber: cleanAdmissionNumber
-    });
-
-    if (existingStudent) {
-      return res.status(409).json({
-        message: 'This admission number is already registered in your school.'
+    if (cleanAdmissionNumber) {
+      const existingStudent = await Student.findOne({
+        schoolId: cleanSchoolId,
+        admissionNumber: cleanAdmissionNumber
       });
+
+      if (existingStudent) {
+        return res.status(409).json({
+          message: 'This admission number is already registered in your school.'
+        });
+      }
     }
 
     const accessCode = await createAccessCode();
@@ -564,11 +564,11 @@ async function getStudentQuestions(req, res) {
       });
     }
 
-    
-const baseFilter = {
-  schoolId: student.schoolId,
-  studentClass: student.studentClass
-};
+
+    const baseFilter = {
+      schoolId: student.schoolId,
+      studentClass: student.studentClass
+    };
 
 
     const questions = await Question.find({
@@ -692,7 +692,7 @@ async function submitStudentAnswers(req, res) {
       score: result.score,
       totalMarks: result.totalMarks
     });
-  }    catch (error) {
+  } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({
         message: 'You have already used this attempt.'
